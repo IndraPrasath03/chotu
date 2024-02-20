@@ -1,0 +1,81 @@
+class ChatScreen extends StatefulWidget {
+  @override
+  _ChatScreenState createState() => _ChatScreenState();
+}
+
+class _ChatScreenState extends State<ChatScreen> {
+  final TextEditingController _messageController = TextEditingController();
+  final ImagePicker _imagePicker = ImagePicker();
+
+  Future<void> _pickImage() async {
+    final XFile? pickedFile = await _imagePicker.pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
+      // Handle picked image, e.g., send it as a message
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Chat'),
+      ),
+      body: Column(
+        children: [
+          // Chat messages display
+          Expanded(
+            child: ListView(
+              padding: EdgeInsets.all(8.0),
+              children: [
+                // Replace this with logic to display messages
+                ListTile(
+                  title: Text('Sender'),
+                  subtitle: Text('Hello, how are you?'),
+                  leading: CircleAvatar(
+                    child: Icon(Icons.person),
+                  ),
+                ),
+                ListTile(
+                  title: Text('Receiver'),
+                  subtitle: Text('I\'m good, thank you!'),
+                  trailing: CircleAvatar(
+                    child: Icon(Icons.person),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          // Input field for text message
+          Container(
+            padding: EdgeInsets.all(8.0),
+            child: Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: _messageController,
+                    decoration: InputDecoration(
+                      hintText: 'Type a message...',
+                    ),
+                  ),
+                ),
+                IconButton(
+                  icon: Icon(Icons.image),
+                  onPressed: _pickImage,
+                ),
+                IconButton(
+                  icon: Icon(Icons.send),
+                  onPressed: () {
+                    // Send text message logic
+                    String message = _messageController.text;
+                    _messageController.clear();
+                    // Send the message
+                  },
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}

@@ -1,0 +1,39 @@
+import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+
+class ChatScreen extends StatefulWidget {
+  @override
+  _ChatScreenState createState() => _ChatScreenState();
+}
+
+class _ChatScreenState extends State<ChatScreen> {
+  final ImagePicker _imagePicker = ImagePicker();
+
+  Future<void> _pickImage() async {
+    final XFile? pickedFile = await _imagePicker.pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
+      // Handle picked image, e.g., send it as a message
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Chat'),
+      ),
+      body: Column(
+        children: [
+          // Chat messages display
+          // Implement your chat messages display logic here
+
+          // Button to pick an image
+          ElevatedButton(
+            onPressed: _pickImage,
+            child: Text('Pick Image'),
+          ),
+        ],
+      ),
+    );
+  }
+}

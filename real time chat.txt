@@ -1,0 +1,120 @@
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+  runApp(MyApp());
+}
+
+import 'package:flutter/material.dart';
+
+class ChatScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Chat'),
+      ),
+      body: Column(
+        children: [
+          Expanded(
+            child: ListView.builder(
+              itemCount: messages.length,
+              itemBuilder: (context, index) {
+                return ListTile(
+                  title: Text(messages[index]['text']),
+                  subtitle: Text(messages[index]['senderId']),
+                );
+              },
+            ),
+          ),
+          TextField(
+            decoration: InputDecoration(
+              hintText: 'Enter message...',
+              suffixIcon: IconButton(
+                icon: Icon(Icons.send),
+                onPressed: () {
+                  // Send message logic
+                },
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+import 'package:cloud_firestore/cloud_firestore.dart';
+
+class ChatService {
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
+  Stream<QuerySnapshot> getMessages(String chatId) {
+    return _firestore
+        .collection('chats')
+        .doc(chatId)
+        .collection('messages')
+        .orderBy('timestamp', descending: true)
+        .snapshots();
+  }
+
+  Future<void> sendMessage(String chatId, String senderId, String text) async {
+    await _firestore.collection('chats').doc(chatId).collection('messages').add({
+      'senderId': senderId,
+      'text': text,
+      'timestamp': DateTime.now(),
+    });
+  }
+}
+
+class ChatScreen extends StatelessWidget {
+  final ChatService _chatService = ChatService();
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Chat'),
+      ),
+      body: Column(
+        children: [
+          Expanded(
+            child: StreamBuilder<QuerySnapshot>(
+              stream: _chatService.getMessages('your_chat_id'),
+              builder: (context, snapshot) {
+                if (!snapshot.hasData) {
+                  return Center(
+                    child: CircularProgressIndicator(),
+                  );
+                }
+                var messages = snapshot.data!.docs;
+                return ListView.builder(
+                  reverse: true,
+                  itemCount: messages.length,
+                  itemBuilder: (context, index) {
+                    var message = messages[index];
+                    return ListTile(
+                      title: Text(message['text']),
+                      subtitle: Text(message['senderId']),
+                    );
+                  },
+                );
+              },
+            ),
+          ),
+          TextField(
+            decoration: InputDecoration(
+              hintText: 'Enter message...',
+              suffixIcon: IconButton(
+                icon: Icon(Icons.send),
+                onPressed: () {
+                  _chatService.sendMessage('your_chat_id', 'your_sender_id', messageController.text);
+                  messageController.clear();
+                },
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
