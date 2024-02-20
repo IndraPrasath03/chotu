@@ -1,0 +1,46 @@
+import 'package:agora_rtc_engine/rtc_engine.dart';
+import 'package:flutter/material.dart';
+
+void main() => runApp(MyApp());
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: YourHomePage(),
+    );
+  }
+}
+
+class YourHomePage extends StatefulWidget {
+  @override
+  _YourHomePageState createState() => _YourHomePageState();
+}
+
+class _YourHomePageState extends State<YourHomePage> {
+  @override
+  void initState() {
+    super.initState();
+    initializeAgora();
+  }
+
+  Future<void> initializeAgora() async {
+    // Obtain an App ID from the Agora Console
+    const appId = 'YOUR_AGORA_APP_ID';
+    // Create RTC engine instance
+    final _engine = await RtcEngine.create(appId);
+    // Add event handler to manage state changes
+    // e.g., joining a channel, remote user joining, etc.
+    // _engine..setEventHandler(RtcEngineEventHandler());
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Agora Voice/Video Call'),
+      ),
+      body: Container(),
+    );
+  }
+}

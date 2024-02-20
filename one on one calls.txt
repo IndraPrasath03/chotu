@@ -1,0 +1,69 @@
+class CallScreen extends StatefulWidget {
+  final List<int> users; // List of user IDs for group call
+  final bool isGroupCall;
+
+  CallScreen({required this.users, required this.isGroupCall});
+
+  @override
+  _CallScreenState createState() => _CallScreenState();
+}
+
+class _CallScreenState extends State<CallScreen> {
+  late RtcEngine _engine;
+  bool _isMuted = false;
+  bool _isVideoEnabled = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _initAgora();
+  }
+
+  Future<void> _initAgora() async {
+    await [Permission.camera, Permission.microphone].request();
+
+    // Create and initialize the AgoraRtcEngine
+    _engine = await RtcEngine.create('YOUR_AGORA_APP_ID');
+
+    // Enable video
+    await _engine.enableVideo();
+
+    // Join the channel
+    if (widget.isGroupCall) {
+      await _engine.joinChannel(null, 'group_call', null, 0);
+    } else {
+      await _engine.joinChannel(null, 'one_on_one_call', null, 0);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(widget.isGroupCall ? 'Group Call' : 'One-on-One Call'),
+      ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            _isVideoEnabled
+                ? AgoraRenderWidget(0)
+                : Text('Video is disabled'),
+            SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: _toggleMute,
+              child: Text(_isMuted ? 'Unmute' : 'Mute'),
+            ),
+            ElevatedButton(
+              onPressed: _toggleVideo,
+              child: Text(_isVideoEnabled ? 'Disable Video' : 'Enable Video'),
+            ),
+            ElevatedButton(
+              onPressed: _endCall,
+              child: Text('End Call'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
